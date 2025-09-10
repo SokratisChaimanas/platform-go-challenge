@@ -47,6 +47,12 @@ type FavouriteResponse struct {
 	CreatedAt string    `json:"created_at" example:"2025-09-08T12:34:56Z"`
 }
 
+// AssetsListResponse wraps a list of assets plus the next page cursor.
+type AssetsListResponse struct {
+	Items     []AssetResponse `json:"items"`
+	NextAfter *string         `json:"next_after,omitempty"`
+}
+
 // HealthResponse is used by GET /api/healthz.
 type HealthResponse struct {
 	OK bool `json:"ok" example:"true"`

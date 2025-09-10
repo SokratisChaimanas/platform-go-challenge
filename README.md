@@ -105,15 +105,15 @@ Interactive docs: `GET /docs/` (Swagger UI).
 
 ---
 
-- **GET `/api/users/{user_id}/favourites`** — _List favourites for a user_  
+- **GET /api/users/{user_id}/favourites — List favourited assets (keyset pagination) 
   **Tags:** `favourites`  
   **Path params:**
   - `user_id` (string, UUID, required)  
     **Query params:**
-  - `limit` (int, optional)
-  - `offset` (int, optional)  
+  - `limit` (int, optional) — max items to return (default 20, max 50)
+  - `offset` (string, optional) — opaque cursor from the previous next_after
     **Responses:**
-  - `200 OK` — `[]` **AssetResponse**
+  - `200 OK` — `[]` **AssetsListResponse**
   - `400 Bad Request` — **ErrorResponse**
   - `404 Not Found` — **ErrorResponse**
   - `500 Internal Server Error` — **ErrorResponse**

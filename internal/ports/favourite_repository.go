@@ -7,12 +7,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// ListOptions controls pagination when listing favourites.
-type ListOptions struct {
-	Limit  int
-	Offset int
-}
-
 // FavouriteRepository stores and queries favourites.
 type FavouriteRepository interface {
 	// Create inserts a favourite. Duplicate should return domain.ErrFavouriteAlreadyExists.
@@ -24,6 +18,7 @@ type FavouriteRepository interface {
 	// Exists checks whether (user, asset) is already favourited.
 	Exists(ctx context.Context, userID, assetID uuid.UUID) (bool, error)
 
-	// ListAssetsFavouritedByUser returns a user's favourites (paged via ports.ListOptions).
-	ListAssetsFavouritedByUser(ctx context.Context, userID uuid.UUID, opt ListOptions) ([]domain.Asset, error)
+	// ListAssetsFavouritedByUserKeyset returns assets favourited by a user,
+	// ordered by favourite.created_at,id, and an opaque next cursor.
+	ListAssetsFavouritedByUserKeyset(ctx context.Context, userID uuid.UUID, limit int, after string) ([]domain.Asset, *string, error)
 }

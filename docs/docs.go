@@ -152,7 +152,7 @@ const docTemplate = `{
         },
         "/users/{user_id}/favourites": {
             "get": {
-                "description": "Returns a paginated list of favourites for the user.",
+                "description": "Returns assets the user has favourited using keyset pagination.",
                 "consumes": [
                     "application/json"
                 ],
@@ -173,14 +173,14 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Max items to return",
+                        "description": "Max items to return (default 20, max 50)",
                         "name": "limit",
                         "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "description": "Items to skip",
-                        "name": "offset",
+                        "type": "string",
+                        "description": "Opaque cursor from next_after",
+                        "name": "after",
                         "in": "query"
                     }
                 ],
@@ -188,10 +188,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/handlers.FavouriteResponse"
-                            }
+                            "$ref": "#/definitions/handlers.AssetsListResponse"
                         }
                     },
                     "400": {
@@ -380,12 +377,26 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.AssetsListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.AssetResponse"
+                    }
+                },
+                "next_after": {
+                    "type": "string"
+                }
+            }
+        },
         "handlers.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "user not found"
+                    "example": "error description"
                 }
             }
         },

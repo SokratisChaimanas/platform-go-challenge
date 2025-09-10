@@ -65,14 +65,16 @@ func (favService *FavouritesService) Remove(ctx context.Context, userID, assetID
 	return favService.favRepo.Delete(ctx, userID, assetID)
 }
 
-// ListByUser returns a user's favourited domain.Asset with pagination.
-func (favService *FavouritesService) ListByUser(ctx context.Context, userID uuid.UUID, opt ports.ListOptions) ([]domain.Asset, error) {
+// ListByUserKeyset returns a user's favourited assets using a keyset cursor.
+func (favService *FavouritesService) ListByUserKeyset(ctx context.Context, userID uuid.UUID, limit int, after string) ([]domain.Asset, *string, error) {
+	// Validate the user exists (same as ListByUser does).
 	ok, err := favService.userRepo.Exists(ctx, userID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if !ok {
-		return nil, domain.ErrUserNotFound
+		return nil, nil, domain.ErrUserNotFound
 	}
-	return favService.favRepo.ListAssetsFavouritedByUser(ctx, userID, opt)
+	// Delegate to repository (repo clamps limit to defaults/caps just like your offset path).
+	return favService.favRepo.ListAssetsFavouritedByUserKeyset(ctx, userID, limit, after)
 }

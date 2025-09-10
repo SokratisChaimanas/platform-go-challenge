@@ -52,5 +52,6 @@ func (Favourite) Edges() []ent.Edge {
 func (Favourite) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("user_id", "asset_id").Unique(),
+		index.Fields("user_id", "created_at", "id"),
 	}
 }

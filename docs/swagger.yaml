@@ -33,10 +33,19 @@ definitions:
         - $ref: '#/definitions/domain.AssetType'
         example: chart
     type: object
+  handlers.AssetsListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/handlers.AssetResponse'
+        type: array
+      next_after:
+        type: string
+    type: object
   handlers.ErrorResponse:
     properties:
       error:
-        example: user not found
+        example: error description
         type: string
     type: object
   handlers.FavouriteAddRequest:
@@ -167,30 +176,28 @@ paths:
     get:
       consumes:
       - application/json
-      description: Returns a paginated list of favourites for the user.
+      description: Returns assets the user has favourited using keyset pagination.
       parameters:
       - description: User ID (UUID)
         in: path
         name: user_id
         required: true
         type: string
-      - description: Max items to return
+      - description: Max items to return (default 20, max 50)
         in: query
         name: limit
         type: integer
-      - description: Items to skip
+      - description: Opaque cursor from next_after
         in: query
-        name: offset
-        type: integer
+        name: after
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/handlers.FavouriteResponse'
-            type: array
+            $ref: '#/definitions/handlers.AssetsListResponse'
         "400":
           description: Bad Request
           schema:

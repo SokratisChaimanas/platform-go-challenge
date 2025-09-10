@@ -54,6 +54,11 @@ var (
 				Unique:  true,
 				Columns: []*schema.Column{FavouritesColumns[3], FavouritesColumns[2]},
 			},
+			{
+				Name:    "favourite_user_id_created_at_id",
+				Unique:  false,
+				Columns: []*schema.Column{FavouritesColumns[3], FavouritesColumns[1], FavouritesColumns[0]},
+			},
 		},
 	}
 	// UsersColumns holds the columns for the "users" table.

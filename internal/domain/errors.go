@@ -18,4 +18,5 @@ var (
 	// Favourite errors
 	ErrFavouriteNotFound      = errors.New("favourite not found")
 	ErrFavouriteAlreadyExists = errors.New("favourite already exists")
+	ErrBadCursor              = errors.New("bad cursor")
 )

@@ -8,7 +8,6 @@ import (
 
 	"github.com/SokratisChaimanas/platform-go-challenge/internal/app"
 	"github.com/SokratisChaimanas/platform-go-challenge/internal/domain"
-	"github.com/SokratisChaimanas/platform-go-challenge/internal/ports"
 	"github.com/google/uuid"
 )
 
@@ -23,19 +22,20 @@ func NewFavouritesHandler(favService *app.FavouritesService) *FavouritesHandler 
 
 // ListByUser godoc
 // @Summary      List favourites for a user
-// @Description  Returns a paginated list of favourites for the user.
+// @Description  Returns assets the user has favourited using keyset pagination.
 // @Tags         favourites
 // @Accept       json
 // @Produce      json
 // @Param        user_id  path   string  true   "User ID (UUID)"
-// @Param        limit    query  int     false  "Max items to return"
-// @Param        offset   query  int     false  "Items to skip"
-// @Success      200      {array}  handlers.AssetResponse
-// @Failure      400      {object} handlers.ErrorResponse
-// @Failure      404      {object} handlers.ErrorResponse
-// @Failure      500      {object} handlers.ErrorResponse
+// @Param        limit    query  int     false  "Max items to return (default 20, max 50)"
+// @Param        after    query  string  false  "Opaque cursor from next_after"
+// @Success      200      {object}  handlers.AssetsListResponse
+// @Failure      400      {object}  handlers.ErrorResponse
+// @Failure      404      {object}  handlers.ErrorResponse
+// @Failure      500      {object}  handlers.ErrorResponse
 // @Router       /users/{user_id}/favourites [get]
 func (handler *FavouritesHandler) ListByUser(writer http.ResponseWriter, req *http.Request) {
+	// Returns assets + a next_after cursor. Uses keyset pagination, not offset.
 	writer.Header().Set("Content-Type", "application/json")
 
 	userID, ok := parseUUIDParam(writer, req, "user_id")
@@ -43,20 +43,27 @@ func (handler *FavouritesHandler) ListByUser(writer http.ResponseWriter, req *ht
 		return
 	}
 
-	limit, offset, ok := parsePagination(writer, req)
+	// Reuse your parsePagination to keep limit defaults/caps consistent; ignore offset.
+	limit, _, ok := parsePagination(writer, req)
 	if !ok {
 		return
 	}
 
-	items, err := handler.favService.ListByUser(req.Context(), userID, ports.ListOptions{Limit: limit, Offset: offset})
+	after := req.URL.Query().Get("after")
+
+	items, nextAfter, err := handler.favService.ListByUserKeyset(req.Context(), userID, limit, after)
 	if err != nil {
-		if errors.Is(err, domain.ErrUserNotFound) {
+		switch {
+		case errors.Is(err, domain.ErrUserNotFound):
 			WriteJsonError(writer, "user not found", http.StatusNotFound)
 			return
+		case errors.Is(err, domain.ErrBadCursor):
+			WriteJsonError(writer, "bad cursor", http.StatusBadRequest)
+			return
+		default:
+			WriteJsonError(writer, "internal error", http.StatusInternalServerError)
+			return
 		}
-
-		WriteJsonError(writer, "internal error", http.StatusInternalServerError)
-		return
 	}
 
 	out := make([]AssetResponse, 0, len(items))
@@ -69,7 +76,10 @@ func (handler *FavouritesHandler) ListByUser(writer http.ResponseWriter, req *ht
 		})
 	}
 
-	_ = json.NewEncoder(writer).Encode(out)
+	_ = json.NewEncoder(writer).Encode(AssetsListResponse{
+		Items:     out,
+		NextAfter: nextAfter,
+	})
 }
 
 // Add godoc

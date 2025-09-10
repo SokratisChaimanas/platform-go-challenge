@@ -9,7 +9,7 @@ import (
 	"github.com/SokratisChaimanas/platform-go-challenge/ent"
 )
 
-// The AssetFunc type is an adapters to allow the use of ordinary
+// The AssetFunc type is an adapter to allow the use of ordinary
 // function as Asset mutator.
 type AssetFunc func(context.Context, *ent.AssetMutation) (ent.Value, error)
 
@@ -21,7 +21,7 @@ func (f AssetFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AssetMutation", m)
 }
 
-// The FavouriteFunc type is an adapters to allow the use of ordinary
+// The FavouriteFunc type is an adapter to allow the use of ordinary
 // function as Favourite mutator.
 type FavouriteFunc func(context.Context, *ent.FavouriteMutation) (ent.Value, error)
 
@@ -33,7 +33,7 @@ func (f FavouriteFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FavouriteMutation", m)
 }
 
-// The UserFunc type is an adapters to allow the use of ordinary
+// The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)
 

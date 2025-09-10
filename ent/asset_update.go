@@ -29,20 +29,6 @@ func (_u *AssetUpdate) Where(ps ...predicate.Asset) *AssetUpdate {
 	return _u
 }
 
-// SetAssetType sets the "asset_type" field.
-func (_u *AssetUpdate) SetAssetType(v asset.AssetType) *AssetUpdate {
-	_u.mutation.SetAssetType(v)
-	return _u
-}
-
-// SetNillableAssetType sets the "asset_type" field if the given value is not nil.
-func (_u *AssetUpdate) SetNillableAssetType(v *asset.AssetType) *AssetUpdate {
-	if v != nil {
-		_u.SetAssetType(*v)
-	}
-	return _u
-}
-
 // SetDescription sets the "description" field.
 func (_u *AssetUpdate) SetDescription(v string) *AssetUpdate {
 	_u.mutation.SetDescription(v)
@@ -133,11 +119,6 @@ func (_u *AssetUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *AssetUpdate) check() error {
-	if v, ok := _u.mutation.AssetType(); ok {
-		if err := asset.AssetTypeValidator(v); err != nil {
-			return &ValidationError{Name: "asset_type", err: fmt.Errorf(`ent: validator failed for field "Asset.asset_type": %w`, err)}
-		}
-	}
 	if v, ok := _u.mutation.Description(); ok {
 		if err := asset.DescriptionValidator(v); err != nil {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Asset.description": %w`, err)}
@@ -157,9 +138,6 @@ func (_u *AssetUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := _u.mutation.AssetType(); ok {
-		_spec.SetField(asset.FieldAssetType, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(asset.FieldDescription, field.TypeString, value)
@@ -230,20 +208,6 @@ type AssetUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *AssetMutation
-}
-
-// SetAssetType sets the "asset_type" field.
-func (_u *AssetUpdateOne) SetAssetType(v asset.AssetType) *AssetUpdateOne {
-	_u.mutation.SetAssetType(v)
-	return _u
-}
-
-// SetNillableAssetType sets the "asset_type" field if the given value is not nil.
-func (_u *AssetUpdateOne) SetNillableAssetType(v *asset.AssetType) *AssetUpdateOne {
-	if v != nil {
-		_u.SetAssetType(*v)
-	}
-	return _u
 }
 
 // SetDescription sets the "description" field.
@@ -349,11 +313,6 @@ func (_u *AssetUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *AssetUpdateOne) check() error {
-	if v, ok := _u.mutation.AssetType(); ok {
-		if err := asset.AssetTypeValidator(v); err != nil {
-			return &ValidationError{Name: "asset_type", err: fmt.Errorf(`ent: validator failed for field "Asset.asset_type": %w`, err)}
-		}
-	}
 	if v, ok := _u.mutation.Description(); ok {
 		if err := asset.DescriptionValidator(v); err != nil {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Asset.description": %w`, err)}
@@ -390,9 +349,6 @@ func (_u *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error)
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := _u.mutation.AssetType(); ok {
-		_spec.SetField(asset.FieldAssetType, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(asset.FieldDescription, field.TypeString, value)
