@@ -156,27 +156,25 @@ func (handler *FavouritesHandler) Add(writer http.ResponseWriter, req *http.Requ
 // @Failure      404       {object} handlers.ErrorResponse
 // @Failure      500       {object} handlers.ErrorResponse
 // @Router       /users/{user_id}/favourites/{asset_id} [delete]
-func (handler *FavouritesHandler) Remove(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	userID, ok := parseUUIDParam(w, r, "user_id")
+func (handler *FavouritesHandler) Remove(writer http.ResponseWriter, req *http.Request) {
+	userID, ok := parseUUIDParam(writer, req, "user_id")
 	if !ok {
 		return
 	}
-	assetID, ok := parseUUIDParam(w, r, "asset_id")
+	assetID, ok := parseUUIDParam(writer, req, "asset_id")
 	if !ok {
 		return
 	}
 
-	if err := handler.favService.Remove(r.Context(), userID, assetID); err != nil {
+	if err := handler.favService.Remove(req.Context(), userID, assetID); err != nil {
 		if errors.Is(err, domain.ErrFavouriteNotFound) {
-			WriteJsonError(w, "favourite not found", http.StatusNotFound)
+			WriteJsonError(writer, "favourite not found", http.StatusNotFound)
 			return
 		}
 
-		WriteJsonError(w, "internal error", http.StatusInternalServerError)
+		WriteJsonError(writer, "internal error", http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	writer.WriteHeader(http.StatusNoContent)
 }

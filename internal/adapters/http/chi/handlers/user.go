@@ -8,7 +8,6 @@ import (
 
 	"github.com/SokratisChaimanas/platform-go-challenge/internal/app"
 	"github.com/SokratisChaimanas/platform-go-challenge/internal/domain"
-	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
 
@@ -36,14 +35,13 @@ func NewUserHandler(userService *app.UserService) *UserHandler {
 func (handler *UserHandler) Get(writer http.ResponseWriter, req *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
 
-	idStr := chi.URLParam(req, "user_id")
-	id, err := uuid.Parse(idStr)
-	if err != nil {
+	userId, ok := parseUUIDParam(writer, req, "user_id")
+	if !ok {
 		WriteJsonError(writer, "invalid user_id", http.StatusBadRequest)
 		return
 	}
 
-	u, err := handler.userService.Get(req.Context(), id)
+	u, err := handler.userService.Get(req.Context(), userId)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {
 			WriteJsonError(writer, "user not found", http.StatusNotFound)

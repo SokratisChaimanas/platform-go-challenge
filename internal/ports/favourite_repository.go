@@ -24,6 +24,6 @@ type FavouriteRepository interface {
 	// Exists checks whether (user, asset) is already favourited.
 	Exists(ctx context.Context, userID, assetID uuid.UUID) (bool, error)
 
-	// ListAssetsFavouritedByUser ListByUser returns a user's favourites (paged via ports.ListOptions).
+	// ListAssetsFavouritedByUser returns a user's favourites (paged via ports.ListOptions).
 	ListAssetsFavouritedByUser(ctx context.Context, userID uuid.UUID, opt ListOptions) ([]domain.Asset, error)
 }

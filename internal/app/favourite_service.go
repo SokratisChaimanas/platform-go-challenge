@@ -8,8 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// FavouritesService manages "user favRepo an asset" workflows.
-// It coordinates multiple repositories and applies business rules.
+// FavouritesService coordinates multiple repositories and applies business rules.
 type FavouritesService struct {
 	userRepo  ports.UserRepository
 	assetRepo ports.AssetRepository

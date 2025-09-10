@@ -37,7 +37,7 @@ ent/              # ent schema & generated code
 **Entities**
 - `User` — ID (UUID), timestamp
 - `Asset` — ID (UUID), `type` (`chart|insight|audience`), `description`, `payload` (free-form JSON), timestamp
-- `Favourite` — `(user_id, asset_id)` pair + timestamp
+- `Favourite` — ID (UUID), `(user_id, asset_id)` pair,timestamp
 
 **Key services**
 - `FavouritesService` — validates user & asset, prevents duplicates, creates/removes/list favourites
@@ -61,14 +61,14 @@ docker compose up --build
 ### Environment
 Config comes from env vars (see `.env`):
 
-| Var | Default | Purpose |
-| --- | --- | --- |
-| `APP_ENV` | `dev` | Controls dev-only seeding |
-| `HTTP_ADDR` | `:8080` | Listen address inside the container |
-| `DB_HOST`/`DB_PORT`/`DB_NAME`/`DB_USER`/`DB_PASS` | `postgres`/`5432`/`favs`/`app`/`app` | Postgres connection |
-| `DB_SSLMODE` | `disable` | Postgres SSL mode |
-| `LOG_LEVEL` | `info` | slog level |
-
+| Var                                               | Default | Purpose                             |
+|---------------------------------------------------| --- |-------------------------------------|
+| `APP_ENV`                                         | `dev` | Controls dev-only seeding           |
+| `HTTP_ADDR`                                       | `:8080` | Listen address inside the container |
+| `DB_HOST`/`DB_PORT`/`DB_NAME`/`DB_USER`/`DB_PASS` | `postgres`/`5432`/`favs`/`app`/`app` | Postgres connection                 |
+| `DB_SSLMODE`                                      | `disable` | Postgres SSL mode                   |
+| `LOG_LEVEL`                                       | `info` | Level of logging                    |
+| `LOG_PATH`                                        | `./logs` | Path of logging files               |
 Compose additionally maps `${HTTP_PORT:-8080}:8080`, so you can override the **host** port with `HTTP_PORT=9090` etc.
 
 ## API & Swagger
@@ -185,4 +185,4 @@ When `APP_ENV=dev` (or `SEED=1`), the DB is pre-populated with a few users and a
 - Pagination for listing favourites uses `limit` (defaults to 20, max 50) and `offset`.
 - Duplicate favourite inserts respond with **409 Conflict**.
 - ent applies schema migrations on startup; dev seeding runs once when the DB is empty.
-- logs slog will be saved on ./logs. The dir will be made after the first build.
+- Logs will be saved on ./logs. The dir will be made after the first build.

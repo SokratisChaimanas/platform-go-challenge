@@ -7,7 +7,7 @@ import (
 
 // ErrorResponse is used for error payloads (consistent across endpoints).
 type ErrorResponse struct {
-	Error string `json:"error" example:"user not found"`
+	Error string `json:"error" example:"error description"`
 }
 
 // --- Users ---

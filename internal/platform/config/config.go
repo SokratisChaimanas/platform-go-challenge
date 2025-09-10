@@ -7,7 +7,7 @@ import (
 // Config holds the minimal app settings.
 type Config struct {
 	AppEnv   string
-	HTTPPort string
+	HTTPAddr string
 
 	DBHost    string
 	DBPort    string
@@ -25,7 +25,7 @@ type Config struct {
 func LoadFromEnv() *Config {
 	return &Config{
 		AppEnv:   getEnvOrFallback("APP_ENV", "dev"),
-		HTTPPort: getEnvOrFallback("HTTP_ADDR", ":8080"),
+		HTTPAddr: getEnvOrFallback("HTTP_ADDR", ":8080"),
 
 		DBHost:    getEnvOrFallback("DB_HOST", "postgres"),
 		DBPort:    getEnvOrFallback("DB_PORT", "5432"),
