@@ -44,31 +44,10 @@ ent/              # ent schema & generated code
 - `AssetService` — edits asset descriptions with simple validation
 - `UserService` — retrieves users
 
-## Repository layout
-
-```text
-cmd/api/
-  main.go      # wiring (config, db client, router, graceful shutdown)
-  swg.go       # Swagger metadata (title, basePath, etc.)
-internal/
-  adapters/
-    http/chi/handlers/  # health, user, favourites, assets handlers
-    ent/                # ent-backed repository implementations
-  app/                  # use-cases: user, favourites, asset
-  domain/               # entities + domain errors
-  ports/                # repository interfaces
-  platform/
-    config/             # env -> Config
-    db/                 # ent client + dev seeding
-  shared/logger/        # slog helpers
-docs/                   # generated OpenAPI (json|yaml|go)
-ent/schema/             # ent Entity schemas (user, asset, favourite)
-Dockerfile, docker-compose.yml, .env
-```
 
 ## How to run
 
-### With Docker Compose (recommended)
+### With Docker Compose
 Requirements: Docker Desktop / Engine + Compose.
 
 ```bash
@@ -97,30 +76,69 @@ Compose additionally maps `${HTTP_PORT:-8080}:8080`, so you can override the **h
 - **Swagger UI**: `http://localhost:8080/docs/` (served by `http-swagger`).
 - OpenAPI is generated and also checked into `docs/swagger.json` & `docs/swagger.yaml`.
 
+### API Overview
+
+Base path: `/api`  
+All requests/responses use `application/json`.  
+Interactive docs: `GET /docs/` (Swagger UI).
+
+---
+
 ### Endpoints
-- **PATCH /api/assets/{asset_id}/description** — _Edit asset description_  
-  Tags: `assets`  
-  Responses: 200, 400, 404, 500
-  Parameters: `asset_id` (path, string, required), `payload` (body, #/definitions/handlers.AssetEditRequest, required)
-- **GET /api/healthz** — _Health check_  
-  Tags: `health`  
-  Responses: 200
-- **GET /api/users/{user_id}** — _Get user_  
-  Tags: `users`  
-  Responses: 200, 400, 404, 500
-  Parameters: `user_id` (path, string, required)
-- **GET /api/users/{user_id}/favourites** — _List favourites for a user_  
-  Tags: `favourites`  
-  Responses: 200, 400, 404, 500
-  Parameters: `user_id` (path, string, required), `limit` (query, integer, optional), `offset` (query, integer, optional)
-- **POST /api/users/{user_id}/favourites** — _Add favourite_  
-  Tags: `favourites`  
-  Responses: 201, 400, 404, 409, 500
-  Parameters: `user_id` (path, string, required), `payload` (body, #/definitions/handlers.FavouriteAddRequest, required)
-- **DELETE /api/users/{user_id}/favourites/{asset_id}** — _Remove favourite_  
-  Tags: `favourites`  
-  Responses: 204, 400, 404, 500
-  Parameters: `user_id` (path, string, required), `asset_id` (path, string, required)
+
+- **GET `/api/healthz`** — _Health check_  
+  **Tags:** `health`  
+  **Responses:**
+  - `200 OK` — `{ "ok": true }`
+
+---
+
+- **GET `/api/users/{user_id}`** — _Get user_  
+  **Tags:** `users`  
+  **Path params:**
+  - `user_id` (string, UUID, required)  
+    **Responses:**
+  - `200 OK` — **UserResponse** `{ id, created_at }`
+  - `400 Bad Request` — **ErrorResponse**
+  - `404 Not Found` — **ErrorResponse**
+  - `500 Internal Server Error` — **ErrorResponse**
+
+---
+
+- **GET `/api/users/{user_id}/favourites`** — _List favourites for a user_  
+  **Tags:** `favourites`  
+  **Path params:**
+  - `user_id` (string, UUID, required)  
+    **Query params:**
+  - `limit` (int, optional)
+  - `offset` (int, optional)  
+    **Responses:**
+  - `200 OK` — `[]` **AssetResponse**
+  - `400 Bad Request` — **ErrorResponse**
+  - `404 Not Found` — **ErrorResponse**
+  - `500 Internal Server Error` — **ErrorResponse**
+
+- **POST `/api/users/{user_id}/favourites`** — _Add favourite_  
+  **Tags:** `favourites`  
+  **Path params:**
+  - `user_id` (string, UUID, required)  
+    **Request body:** **FavouriteAddRequest**
+  ```json
+  {
+    "asset_id": "aaaaaaa1-0000-0000-0000-000000000001"
+  }
+
+- **DELETE `/api/users/{user_id}/favourites/{asset_id}`** — _Remove favourite_  
+  **Tags:** `favourites`  
+  **Path params:**
+  - `user_id` (string, UUID, required)
+  - `asset_id` (string, UUID, required)  
+    **Responses:**
+  - `204 No Content`
+  - `400 Bad Request` — **ErrorResponse**
+  - `404 Not Found` — **ErrorResponse**
+  - `500 Internal Server Error` — **ErrorResponse**
+
 
 ### Quick cURL examples
 ```bash
@@ -167,3 +185,4 @@ When `APP_ENV=dev` (or `SEED=1`), the DB is pre-populated with a few users and a
 - Pagination for listing favourites uses `limit` (defaults to 20, max 50) and `offset`.
 - Duplicate favourite inserts respond with **409 Conflict**.
 - ent applies schema migrations on startup; dev seeding runs once when the DB is empty.
+- logs slog will be saved on ./logs. The dir will be made after the first build.

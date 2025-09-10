@@ -7,7 +7,7 @@ import (
 // Config holds the minimal app settings.
 type Config struct {
 	AppEnv   string
-	HTTPAddr string
+	HTTPPort string
 
 	DBHost    string
 	DBPort    string
@@ -17,6 +17,7 @@ type Config struct {
 	DBSSLMode string
 
 	LogLevel string
+	LogPath  string
 }
 
 // LoadFromEnv builds a Config by reading environment variables.
@@ -24,7 +25,7 @@ type Config struct {
 func LoadFromEnv() *Config {
 	return &Config{
 		AppEnv:   getEnvOrFallback("APP_ENV", "dev"),
-		HTTPAddr: getEnvOrFallback("HTTP_ADDR", ":8080"),
+		HTTPPort: getEnvOrFallback("HTTP_ADDR", ":8080"),
 
 		DBHost:    getEnvOrFallback("DB_HOST", "postgres"),
 		DBPort:    getEnvOrFallback("DB_PORT", "5432"),
@@ -33,7 +34,8 @@ func LoadFromEnv() *Config {
 		DBPass:    getEnvOrFallback("DB_PASS", "app"),
 		DBSSLMode: getEnvOrFallback("DB_SSLMODE", "disable"),
 
-		LogLevel: getEnvOrFallback("LOG_LEVEL", "debug"),
+		LogLevel: getEnvOrFallback("LOG_LEVEL", "info"),
+		LogPath:  getEnvOrFallback("LOG_PATH", "./logs/"),
 	}
 }
 

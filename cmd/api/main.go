@@ -25,10 +25,10 @@ func main() {
 
 	// Logger
 	level := parseLevel(cfg.LogLevel)
-	log := logger.NewLogger(level)
+	log := logger.NewFileLogger(level, cfg.LogPath, 10) // 10MB rotate
 	log.Info("starting service",
 		"env", cfg.AppEnv,
-		"http_addr", cfg.HTTPAddr,
+		"http_addr", cfg.HTTPPort,
 		"db_host", cfg.DBHost,
 		"db_name", cfg.DBName,
 	)
@@ -64,7 +64,7 @@ func main() {
 
 	// HTTP server
 	srv := &http.Server{
-		Addr:              cfg.HTTPAddr,
+		Addr:              cfg.HTTPPort,
 		Handler:           router,
 		ReadTimeout:       15 * time.Second,
 		ReadHeaderTimeout: 10 * time.Second,
@@ -74,7 +74,7 @@ func main() {
 
 	// Run server in background
 	go func() {
-		log.Info("http server listening", "addr", cfg.HTTPAddr)
+		log.Info("http server listening", "addr", cfg.HTTPPort)
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Error("http server error", "err", err)
 		}
